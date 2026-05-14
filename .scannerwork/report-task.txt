@@ -1,0 +1,6 @@
+projectKey=dashboard
+serverUrl=https://sonar.sxdentrypoint.my.id
+serverVersion=10.3.0.82913
+dashboardUrl=https://sonar.sxdentrypoint.my.id/dashboard?id=dashboard
+ceTaskId=AZ4lUdS38t7cQ3cge7fh
+ceTaskUrl=https://sonar.sxdentrypoint.my.id/api/ce/task?id=AZ4lUdS38t7cQ3cge7fh
