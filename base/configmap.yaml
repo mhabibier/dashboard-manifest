@@ -20,22 +20,16 @@ data:
         listen 80;
         server_name localhost;
 
-        # Gunakan CoreDNS Kubernetes sebagai resolver agar Nginx bisa resolve dinamis
-        resolver 10.96.0.10 valid=10s ipv6=off;
-
         location / {
             root   /usr/share/nginx/html;
             index  index.html index.htm;
             try_files $uri $uri/ /index.html;
         }
 
-        # Proxy API calls ke backend services menggunakan variabel 
-        # untuk mencegah Nginx crash saat startup jika service belum ada (host not found)
+        # Proxy API calls ke backend services
         
         location /api/auth/ {
-            set $auth_backend http://auth-service.auth-service.svc.cluster.local;
-            rewrite ^/api/auth/(.*) /$1 break;
-            proxy_pass         $auth_backend;
+            proxy_pass         http://auth-service.auth-service.svc.cluster.local/;
             proxy_set_header   Host              $host;
             proxy_set_header   X-Real-IP         $remote_addr;
             proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
@@ -43,9 +37,7 @@ data:
         }
 
         location /api/books/ {
-            set $book_backend http://book-service.book-service.svc.cluster.local;
-            rewrite ^/api/books/(.*) /$1 break;
-            proxy_pass         $book_backend;
+            proxy_pass         http://book-service.book-service.svc.cluster.local/;
             proxy_set_header   Host              $host;
             proxy_set_header   X-Real-IP         $remote_addr;
             proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
@@ -53,9 +45,7 @@ data:
         }
 
         location /api/orders/ {
-            set $order_backend http://order-service.order-service.svc.cluster.local;
-            rewrite ^/api/orders/(.*) /$1 break;
-            proxy_pass         $order_backend;
+            proxy_pass         http://order-service.order-service.svc.cluster.local/;
             proxy_set_header   Host              $host;
             proxy_set_header   X-Real-IP         $remote_addr;
             proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
@@ -63,9 +53,7 @@ data:
         }
 
         location /api/payments/ {
-            set $payment_backend http://payment-service.payment-service.svc.cluster.local;
-            rewrite ^/api/payments/(.*) /$1 break;
-            proxy_pass         $payment_backend;
+            proxy_pass         http://payment-service.payment-service.svc.cluster.local/;
             proxy_set_header   Host              $host;
             proxy_set_header   X-Real-IP         $remote_addr;
             proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
@@ -73,9 +61,7 @@ data:
         }
 
         location /api/blockchain/ {
-            set $blockchain_backend http://blockchain-service.blockchain-service.svc.cluster.local;
-            rewrite ^/api/blockchain/(.*) /$1 break;
-            proxy_pass         $blockchain_backend;
+            proxy_pass         http://blockchain-service.blockchain-service.svc.cluster.local:3000/;
             proxy_set_header   Host              $host;
             proxy_set_header   X-Real-IP         $remote_addr;
             proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
