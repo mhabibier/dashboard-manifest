@@ -40,7 +40,7 @@ spec:
         - name: harbor-secret   # docker-registry secret dibuat terpisah oleh admin/pipeline
       containers:
         - name: dashboard
-          image: harbor.sxdentrypoint.my.id/devsecops/dashboard-app:eb45e0cd
+          image: harbor.sxdentrypoint.my.id/devsecops/dashboard-app:662dde26
           imagePullPolicy: Always
           ports:
             - name:          http
