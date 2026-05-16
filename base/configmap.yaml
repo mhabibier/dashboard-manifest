@@ -22,10 +22,50 @@ data:
 
         client_max_body_size 10m;
 
+        # ── Security Headers (OWASP ZAP Fixes) ──────────────────────────────────
+
+        # [Medium] Content Security Policy — izinkan hanya resource dari origin sendiri
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://s3-api.sxdentrypoint.my.id; connect-src 'self'; frame-ancestors 'none';" always;
+
+        # [Medium] Anti-Clickjacking — mencegah halaman di-embed di iframe pihak lain
+        add_header X-Frame-Options "DENY" always;
+
+        # [Low] Cross-Origin-Embedder-Policy
+        add_header Cross-Origin-Embedder-Policy "require-corp" always;
+
+        # [Low] Cross-Origin-Opener-Policy
+        add_header Cross-Origin-Opener-Policy "same-origin" always;
+
+        # [Low] Cross-Origin-Resource-Policy
+        add_header Cross-Origin-Resource-Policy "same-origin" always;
+
+        # [Low] Permissions Policy — nonaktifkan fitur browser yang tidak digunakan
+        add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), accelerometer=(), gyroscope=()" always;
+
+        # [Low] HTTP Strict Transport Security — paksa HTTPS selama 1 tahun
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+        # [Low] Prevent MIME-type sniffing
+        add_header X-Content-Type-Options "nosniff" always;
+
+        # [Informational] Cache control untuk halaman HTML (tidak di-cache browser/proxy)
+        add_header Cache-Control "no-store, no-cache, must-revalidate" always;
+
+        # Sembunyikan versi Nginx dari response header
+        server_tokens off;
+
         location / {
             root   /usr/share/nginx/html;
             index  index.html index.htm;
             try_files $uri $uri/ /index.html;
+        }
+
+        # Static assets boleh di-cache browser (versioned by Vite hash)
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            root  /usr/share/nginx/html;
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+            add_header X-Content-Type-Options "nosniff" always;
         }
 
         # Proxy API calls ke backend services
